@@ -3,6 +3,8 @@ const bodyParser = require("body-parser");
 const cookieparser = require("cookie-parser");
 const app = express();
 const mongoose = require("mongoose");
+const bcrypt = require("bcrypt");
+
 require("dotenv").config();
 
 // MODELS
@@ -27,11 +29,23 @@ app.post("/api/users/register", (req, res) => {
     lastname: req.body.lastname
   });
 
-  user.save((err, doc) => {
-    if (err) {
-      return res.json({ success: false, err });
-    }
-    res.status(200).json({ success: true, userdata: doc });
+  let salt_i = 10;
+
+  bcrypt.genSalt(salt_i, (err, salt) => {
+    if (err) return next(err);
+
+    bcrypt.hash(user.password, salt, (err, hash) => {
+      if (err) return next(err);
+
+      user.password = hash;
+
+      user.save((err, doc) => {
+        if (err) {
+          return res.json({ success: false, err: err });
+        }
+        res.status(200).json({ success: true, userdata: doc });
+      });
+    });
   });
 });
 

@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const bcrypt = require("bcrypt");
 
 const UserSchema = mongoose.Schema({
   email: {
@@ -38,6 +39,21 @@ const UserSchema = mongoose.Schema({
     type: String
   }
 });
+
+// UserSchema.pre("save", next => {
+//   let user = this;
+//   console.log(user);
+//   bcrypt.genSalt((err, salt) => {
+//     if (err) return next(err);
+
+//     bcrypt.hash(this.password, salt, (err, hash) => {
+//       if (err) return next(err);
+
+//       this.password = hash;
+//       next();
+//     });
+//   });
+// });
 
 const User = mongoose.model("User", UserSchema);
 
