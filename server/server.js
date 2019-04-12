@@ -21,6 +21,10 @@ app.use(bodyParser.json());
 app.unsubscribe(cookieparser());
 
 // USERS
+
+// route    POST api/users/register
+// desc     register a user
+// access   public
 app.post("/api/users/register", (req, res) => {
   const user = new User({
     email: req.body.email,
@@ -47,6 +51,39 @@ app.post("/api/users/register", (req, res) => {
       });
     });
   });
+});
+
+// route    POST api/users/login
+// desc     login a user
+// access   public
+app.post("/api/users/login", (req, res) => {
+  // find email
+  User.findOne({ email: req.body.email })
+    .then(user => {
+      user.comparePassword(req.body.password, (err, isMatch) => {
+        if (!isMatch) {
+          return res.json({
+            loginSuccess: false,
+            message: "incorrect password"
+          });
+        }
+        user.generateToken((err, user) => {
+          if (err) return res.json(404).send(err);
+          res
+            .cookie("w_auth", user.token)
+            .status(200)
+            .json({
+              loginSuccess: true
+            });
+        });
+      });
+    })
+    .catch(err =>
+      res.json({ loginSuccess: false, message: "Email not found" })
+    );
+  // check password
+
+  // generate token
 });
 
 const port = process.env.PORT || 3002;
