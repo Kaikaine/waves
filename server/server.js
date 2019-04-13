@@ -10,6 +10,9 @@ require("dotenv").config();
 // MODELS
 const { User } = require("./models/User");
 
+// MIDDLEWARES
+const { auth } = require("./middleware/auth");
+
 mongoose.Promise = global.Promise;
 mongoose
   .connect(process.env.DATABASE)
@@ -21,6 +24,22 @@ app.use(bodyParser.json());
 app.unsubscribe(cookieparser());
 
 // USERS
+
+// route    POST api/users/auth
+// desc     authenticate a user
+// access   public
+app.get("api/users/auth", auth, (req, res) => {
+  res.status(200).json({
+    isAdmin: req.user.role === 0 ? false : true,
+    isAuth: true,
+    email: req.user.email,
+    name: req.user.name,
+    lastname: req.user.lastname,
+    role: req.user.role,
+    cart: req.user.cart,
+    history: req.user.history
+  });
+});
 
 // route    POST api/users/register
 // desc     register a user
@@ -47,7 +66,10 @@ app.post("/api/users/register", (req, res) => {
         if (err) {
           return res.json({ success: false, err: err });
         }
-        res.status(200).json({ success: true, userdata: doc });
+        res.status(200).json({
+          success: true
+          // userdata: doc
+        });
       });
     });
   });

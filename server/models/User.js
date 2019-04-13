@@ -42,21 +42,6 @@ const UserSchema = mongoose.Schema({
   }
 });
 
-// UserSchema.pre("save", next => {
-//   let user = this;
-//   console.log(user);
-//   bcrypt.genSalt((err, salt) => {
-//     if (err) return next(err);
-
-//     bcrypt.hash(this.password, salt, (err, hash) => {
-//       if (err) return next(err);
-
-//       this.password = hash;
-//       next();
-//     });
-//   });
-// });
-
 UserSchema.methods.comparePassword = function(candidatePassword, cb) {
   bcrypt.compare(candidatePassword, this.password, (err, isMatch) => {
     if (err) return cb(err);
@@ -73,6 +58,17 @@ UserSchema.methods.generateToken = function(cb) {
     .save()
     .then(user => cb(null, user))
     .catch(err => cb(err));
+};
+
+UserSchema.statics.findByToken = function(token, cb) {
+  let user = this;
+
+  jwt.verify(token, process.env.SECRET, function(err, decode) {
+    user
+      .findOne({ _id: decode, token: token })
+      .then(user => cb(null, user))
+      .catch(err => cb(err));
+  });
 };
 
 const User = mongoose.model("User", UserSchema);
