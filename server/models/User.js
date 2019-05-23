@@ -61,13 +61,13 @@ UserSchema.methods.generateToken = function(cb) {
 };
 
 UserSchema.statics.findByToken = function(token, cb) {
-  let user = this;
+  var user = this;
 
   jwt.verify(token, process.env.SECRET, function(err, decode) {
-    user
-      .findOne({ _id: decode, token: token })
-      .then(user => cb(null, user))
-      .catch(err => cb(err));
+    user.findOne({ _id: decode, token: token }, function(err, user) {
+      if (err) return cb(err);
+      cb(null, user);
+    });
   });
 };
 

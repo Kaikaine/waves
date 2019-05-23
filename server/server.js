@@ -21,14 +21,14 @@ mongoose
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
-app.unsubscribe(cookieparser());
+app.use(cookieparser());
 
-// USERS
+/////////////////////////// USERS
 
-// route    POST api/users/auth
+// route    GET api/users/auth
 // desc     authenticate a user
-// access   public
-app.get("api/users/auth", auth, (req, res) => {
+// access   private
+app.get("/api/users/auth", auth, (req, res) => {
   res.status(200).json({
     isAdmin: req.user.role === 0 ? false : true,
     isAuth: true,
@@ -106,6 +106,18 @@ app.post("/api/users/login", (req, res) => {
   // check password
 
   // generate token
+});
+
+// route    GET api/users/logout
+// desc     authenticate a user
+// access   private
+app.get("/api/users/logout", auth, (req, res) => {
+  User.findOneAndUpdate({ _id: req.user._id }, { token: "" }, (err, doc) => {
+    if (err) return res.json({ success: false, err });
+    return res.status(200).send({
+      success: true
+    });
+  });
 });
 
 const port = process.env.PORT || 3002;
