@@ -10,6 +10,7 @@ require("dotenv").config();
 // MODELS
 const { User } = require("./models/User");
 const { Brand } = require("./models/Brand");
+const { Wood } = require("./models/Wood");
 
 // MIDDLEWARES
 const { auth } = require("./middleware/auth");
@@ -122,12 +123,35 @@ app.get("/api/users/logout", auth, (req, res) => {
   });
 });
 
+/////////////////////////// WOODS
+
+// route    GET /api/product/wood
+// desc     get all woods
+// access   private
+app.get("/api/product/woods", (req, res) => {
+  Wood.find({})
+    .then(wood => res.status(200).json({ success: true, wood }))
+    .catch(err => res.status(400).json({ success: false, err }));
+});
+
+// route    POST /api/product/wood
+// desc     create a wood
+// access   private
+app.post("/api/product/wood", auth, admin, (req, res) => {
+  const wood = new Wood(req.body);
+
+  wood
+    .save()
+    .then(wood => res.status(200).json({ success: true, wood }))
+    .catch(err => res.status(400).json({ success: false, err }));
+});
+
 /////////////////////////// BRAND
 
-// route    POST /api/product/brands
+// route    GET /api/product/brands
 // desc     find all brands
 // access   private
-app.get("/api/products/brands", (req, res) => {
+app.get("/api/product/brands", (req, res) => {
   Brand.find({})
     .then(brand => res.status(200).json({ success: true, brand }))
     .catch(err => res.status(400).json({ success: false, err }));
