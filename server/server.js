@@ -9,9 +9,11 @@ require("dotenv").config();
 
 // MODELS
 const { User } = require("./models/User");
+const { Brand } = require("./models/Brand");
 
 // MIDDLEWARES
 const { auth } = require("./middleware/auth");
+const { admin } = require("./middleware/admin");
 
 mongoose.Promise = global.Promise;
 mongoose
@@ -118,6 +120,29 @@ app.get("/api/users/logout", auth, (req, res) => {
       success: true
     });
   });
+});
+
+/////////////////////////// BRAND
+
+// route    POST /api/product/brands
+// desc     find all brands
+// access   private
+app.get("/api/products/brands", (req, res) => {
+  Brand.find({})
+    .then(brand => res.status(200).json({ success: true, brand }))
+    .catch(err => res.status(400).json({ success: false, err }));
+});
+
+// route    POST /api/product/brand
+// desc     create a brand
+// access   private
+app.post("/api/product/brand", auth, admin, (req, res) => {
+  const brand = new Brand(req.body);
+
+  brand
+    .save()
+    .then(brand => res.status(200).json({ success: true, brand }))
+    .catch(err => res.json({ success: false, err }));
 });
 
 const port = process.env.PORT || 3002;
