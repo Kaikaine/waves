@@ -179,7 +179,6 @@ app.post("/api/product/brand", auth, admin, (req, res) => {
 //=========================
 //            PRODUCTS
 //=========================
-
 // route    GET /api/product/articles?sortBy=sold&order=desc&limit=4 / /api/product/articles?sortBy=createAt&order=desc&limit=4
 // desc     get products by amount sold
 // access   private
