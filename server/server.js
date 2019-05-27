@@ -11,6 +11,7 @@ require("dotenv").config();
 const { User } = require("./models/User");
 const { Brand } = require("./models/Brand");
 const { Wood } = require("./models/Wood");
+const { Product } = require("./models/Product");
 
 // MIDDLEWARES
 const { auth } = require("./middleware/auth");
@@ -26,7 +27,9 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(cookieparser());
 
-/////////////////////////// USERS
+//=========================
+//            USERS
+//=========================
 
 // route    GET api/users/auth
 // desc     authenticate a user
@@ -123,7 +126,9 @@ app.get("/api/users/logout", auth, (req, res) => {
   });
 });
 
-/////////////////////////// WOODS
+//=========================
+//            WOODS
+//=========================
 
 // route    GET /api/product/wood
 // desc     get all woods
@@ -146,7 +151,9 @@ app.post("/api/product/wood", auth, admin, (req, res) => {
     .catch(err => res.status(400).json({ success: false, err }));
 });
 
-/////////////////////////// BRAND
+//=========================
+//            BRAND
+//=========================
 
 // route    GET /api/product/brands
 // desc     find all brands
@@ -166,6 +173,63 @@ app.post("/api/product/brand", auth, admin, (req, res) => {
   brand
     .save()
     .then(brand => res.status(200).json({ success: true, brand }))
+    .catch(err => res.json({ success: false, err }));
+});
+
+//=========================
+//            PRODUCTS
+//=========================
+
+// route    GET /api/product/articles?sortBy=sold&order=desc&limit=4 / /api/product/articles?sortBy=createAt&order=desc&limit=4
+// desc     get products by amount sold
+// access   private
+app.get("/api/product/articles", (req, res) => {
+  let order = req.query.order ? req.query.order : "asc";
+  let sortBy = req.query.sortBy ? req.query.sortBy : "_id";
+  let limit = req.query.limit ? parseInt(req.query.limit) : 100;
+
+  Product.find()
+    .populate("brand")
+    .populate("wood")
+    .sort([[sortBy, order]])
+    .limit(limit)
+    .exec()
+    .then(articles => res.status(200).json({ articles }))
+    .catch(err => res.status(400).json({ err }));
+});
+
+// route    GET /api/product/articles_by_id?id=
+// desc     get a product by id
+// access   private
+app.get("/api/product/articles_by_id", (req, res) => {
+  let type = req.query.type;
+  let items = req.query.id;
+
+  if (type === "array") {
+    let ids = req.query.id.split(",");
+    items = [];
+    items = ids.map(item => {
+      return mongoose.Types.ObjectId(item);
+    });
+
+    Product.find({ _id: { $in: items } })
+      .populate("brand")
+      .populate("wood")
+      .exec()
+      .then(products => res.status(200).json(products))
+      .catch(err => res.json({ err }));
+  }
+});
+
+// route    POST /api/product/article
+// desc     create a product
+// access   private
+app.post("/api/product/article", auth, admin, (req, res) => {
+  const product = new Product(req.body);
+
+  product
+    .save()
+    .then(product => res.status(200).json({ success: true, product }))
     .catch(err => res.json({ success: false, err }));
 });
 
