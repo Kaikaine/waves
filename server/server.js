@@ -232,6 +232,10 @@ app.post("/api/product/article", auth, admin, (req, res) => {
     .catch(err => res.json({ success: false, err }));
 });
 
+app.get("/", (req, res) => {
+  res.send("Hello");
+});
+
 const port = process.env.PORT || 3002;
 app.listen(port, () => {
   console.log(`Server running on port: ${port}`);
