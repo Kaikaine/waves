@@ -34,7 +34,7 @@ const Footer = () => {
                 <FontAwesomeIcon icon={faClock} className="icon" />
                 <div className="nfo">
                   <div>Working Hours</div>
-                  <div>Mun-Fri - 9am-8pm</div>
+                  <div>Mon-Fri / 9am-8pm</div>
                 </div>
               </div>
               <div className="tag">
